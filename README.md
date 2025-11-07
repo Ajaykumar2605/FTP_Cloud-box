@@ -1,4 +1,3 @@
-cat <<EOF > README.md
 # 🚀 FTP-Box (Flask File Manager)
 
 A simple, elegant Flask-based web file browser and uploader with user management and storage visualization.
