@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+<head>
+  <title>FTP-Box Login</title>
+  <link rel="icon" href="{{ url_for('static', filename='scr/cloud.png') }}" type="image/x-icon">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #04386cff;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+    }
+    main {
+      flex: 1;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    form {
+      background: white;
+      padding: 30px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      text-align: center;
+    }
+    input {
+      display: block;
+      width: 220px;
+      margin: 10px auto;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+    }
+    button {
+      padding: 8px 15px;
+      background: #0b64c4ff;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #117df1ff;
+    }
+    h2 {
+      margin-bottom: 20px;
+      color: #333;
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <form method="POST">
+      <h2>FTP-Box <img src="{{ url_for('static', filename='scr/cloud.png') }}" alt="Cloud" style="width: 24px; vertical-align: middle;">Cloud</h2>
+      <h2>🔐 Login</h2>
+      {% if error %}
+      <p style="color:red;">{{ error }}</p>
+      {% endif %}
+      <input type="text" name="username" placeholder="Username" required>
+      <input type="password" name="password" placeholder="Password" required>
+      <button type="submit" name="action" value="signin">Login</button>
+    </form>
+  </main>
+
+  <footer style="color: white; padding: 20px 0;">
+    <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+      <span>© 2025 <strong style="color: #ffffff;">FTP-Box</strong></span>
+      <span style="color: #ffffff;">|</span>
+      <span>Version 1.0</span>
+      <span style="color: #ffffff;">|</span>
+      <span>Powered by <img src="https://www.redhat.com/favicon.ico" alt="RedHat" style="width: 16px; vertical-align: middle;"> RedHat</span>
+      <span style="color: #ffffff;">|</span>
+      <span>Designed by <strong style="background: linear-gradient(45deg, #ffffff, #00ff88); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AK</strong></span>
+    </div>
+  </footer>
+</body>
+</html>

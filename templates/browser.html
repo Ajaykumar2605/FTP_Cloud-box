@@ -1,0 +1,351 @@
+<!doctype html>
+<html>
+<head>
+  <title>FTP-BOX Cloud</title>
+  <link rel="icon" href="{{ url_for('static', filename='scr/cloud.png') }}" type="image/x-icon">
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/browerstyle.css') }}">
+  
+</head>
+<body>
+<div class="top-bar" style="position:fixed;top:0;left:0;right:0;z-index:9999;background:#fff;border-bottom:1px solid #e6e6e6;padding:12px 20px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 6px rgba(0,0,0,0.06);">
+  <h2 style="margin:0;font-size:1.1rem;">📁 FTP-BOX Cloud</h2>
+ <div class="user-info">
+  <img src="{{ url_for('static', filename='scr/user.png') }}" alt="User Icon" class="user-icon">
+  <span>{{ username }}</span> &nbsp;|&nbsp;
+  <a href="{{ url_for('logout') }}" class="logout-btn">Logout</a>
+</div>
+</div>
+<!-- spacer to prevent content being hidden behind fixed top-bar -->
+<div style="height:56px;"></div>
+<a href="{{ url_for('browse', path='') }}" class="home-btn">🏠 HOME</a> 
+<h4>Current Path: /{{ current_path }}</h4>
+
+{% if session.get("username") == "admin" %}
+<!-- ✅ Floating Storage Card (right-aligned, only for admin) -->
+<div id="storage-container">
+  <div id="storage-card" class="storage-card">
+    <div class="storage-header">
+      <span class="storage-title">💽 Storage</span>
+      <span id="storage-usage" class="storage-usage">Loading...</span>
+    </div>
+    <div id="storage-bar" class="storage-bar">
+      <div class="segment admin"></div>
+      <div class="segment ftpguest"></div>
+      <div class="segment ftpuser"></div>
+      <div class="segment free"></div>
+    </div>
+    <div class="storage-legend">
+      <span><span class="dot" style="background: #4CAF50"></span> Admin</span>
+      <span><span class="dot" style="background: #FFC107"></span> FTP Guest</span>
+      <span><span class="dot" style="background: #3dbcf3ff"></span> FTP User</span>
+      <span><span class="dot" style="background: #E0E0E0"></span> Free</span>
+    </div>
+  </div>
+</div>
+
+<script>
+async function updateStorage() {
+  const res = await fetch('/api/storage');
+  const data = await res.json();
+
+  document.getElementById('storage-usage').textContent =
+    `${data.used_gb} GB / ${data.total_gb} GB (${data.used_percent}%)`;
+  const seg = data.segments;
+  document.querySelector('.segment.admin').style.width = seg.admin + '%';
+  document.querySelector('.segment.ftpguest').style.width = seg.ftpguest + '%';
+  document.querySelector('.segment.ftpuser').style.width = seg.ftpuser + '%';
+  document.querySelector('.segment.free').style.width = seg.free + '%';
+}
+setInterval(updateStorage, 1000);
+updateStorage();
+</script>
+{% endif %}
+<br>
+<br>
+<table>
+  <thead>
+    <tr>
+      <th>Items no</th>
+      <th>Name</th>
+      <th>Type</th>
+      <th>Size</th>
+      <th>Last Modified</th>
+      <th>Permissions</th>
+      <th>Action</th>
+      <th><div class="dropdown">
+          <span class="dropbtn">⚙️</span>
+          <div class="dropdown-content">
+            <a href="#" onclick="createNewFile('{{ current_path }}')">📄 New File</a>
+            <a href="#" onclick="createNewFolder('{{ current_path }}')">📁 New Folder</a>
+          </div>
+      </th>
+    </tr>
+  </thead>
+ <tbody>
+  {% for name, type_, size, modified, perms in files %}
+  <tr>
+    <td>{{ loop.index }}</td>
+
+    <td>
+      {% if name == ".." %}
+        📁 <a href="{{ url_for('browse', path=os.path.dirname(current_path.rstrip('/'))) }}" class="back-link">..</a>
+      {% elif type_ == 'dir' %}
+        📂 <a href="{{ url_for('browse', path=os.path.join(current_path, name)) }}" class="folder-link">{{ name }}</a>
+      {% else %}
+        📄 <span class="file-name">{{ name }}</span>
+      {% endif %}
+    </td>
+
+    <td>{{ type_ }}</td>
+
+    <td>
+      {% if type_ == 'file' %}
+        {% if size >= 1024*1024 %}
+          {{ (size / (1024*1024))|round(2) }} MB
+        {% else %}
+          {{ (size / 1024)|round(2) }} KB
+        {% endif %}
+      {% else %}-{% endif %}
+    </td>
+
+    <td>
+      {% if modified != '-' %}
+        {{ modified|int|datetimeformat }}
+      {% else %}
+        -
+      {% endif %}
+    </td>
+
+    <td>{{ perms }}</td>
+
+    <td>
+      {% if name != ".." %}
+        {% if type_ == 'dir' %}
+          <a href="{{ url_for('download_folder', path=os.path.join(current_path, name)) }}">📦 Download</a>
+        {% else %}
+          <a href="{{ url_for('download', path=os.path.join(current_path, name)) }}">⬇️ Download</a>
+        {% endif %}
+        |
+        <a href="{{ url_for('delete_file', path=os.path.join(current_path, name)) }}" onclick="return confirm('Delete {{ name }}?')">🗑️ Delete</a>
+      {% endif %}
+    </td>
+
+    <td>
+      {% if name != ".." %}
+      <div class="dropdown">
+        <span class="dropbtn">⋮</span>
+        <div class="dropdown-content">
+          <a href="#" onclick="renameItem('{{ name }}','{{ current_path }}')">✏️ Rename</a>
+          {% if type_ == 'dir' %}
+            <a href="#" onclick="compressFolder('{{ current_path }}','{{ name }}')">📦 Compress</a>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+    </td>
+  </tr>
+  {% endfor %}
+</tbody>
+</table>
+<!-- Upload Section -->
+<div class="upload-container">
+  <!-- Toggle button -->
+  <button id="uploadToggle" class="upload-toggle-btn" onclick="toggleUpload()" 
+          title="Upload files" 
+          style="display: block; margin: 20px auto; background-color: #07a657ff; color: white; border: none; padding: 10px 20px; border-radius: 5px; font-size: 1rem; font-weight: bold;">
+    📤 Upload Files
+  </button>
+
+  <!-- Upload form -->
+  <form method="post" enctype="multipart/form-data" 
+        action="{{ url_for('upload', path=current_path) }}" 
+        id="upload-form" style="display: none;" 
+        ondrop="dropHandler(event);" ondragover="dragOverHandler(event);">
+
+    <div class="upload-box">
+      <div class="upload-icon">☁️</div>
+      <p>Drag & Drop files here to upload<br>or</p>
+      <label class="upload-btn">
+        📤 Select Files
+        <input type="file" name="file" id="file-input" multiple required onchange="updateButtonText()">
+      </label>
+      <ul id="file-list" class="file-list"></ul>
+      <p class="upload-note">Maximum upload size: 128 MB</p>
+      <button type="submit" class="submit-btn">🚀 Upload</button>
+
+      <!-- Progress UI -->
+      <div id="progressContainer" style="display:none; margin-top:20px; width:100%; max-width:500px; text-align:left;">
+        <div id="progressTitle" style="font-size:14px; font-weight:bold; margin-bottom:5px; color:#333;">Uploading...</div>
+        <div style="background:#ddd; border-radius:4px; overflow:hidden; height:20px;">
+          <div id="progressBar" style="width:0%; height:100%; background:#4caf50; transition:width 0.3s;"></div>
+        </div>
+        <div id="progressStats" style="font-size:13px; color:#333; margin-top:5px;"></div>
+      </div>
+    </div>
+  </form>
+</div>
+
+<script>
+function toggleUpload() {
+  const form = document.getElementById('upload-form');
+  const btn = document.getElementById('uploadToggle');
+  if (form.style.display === 'none') {
+    form.style.display = 'block';
+    btn.innerHTML = '❌ Close';
+  } else {
+    form.style.display = 'none';
+    btn.textContent = '📤 Upload Files';
+    document.getElementById('file-list').innerHTML = '';
+  }
+}
+function updateButtonText() {
+  const files = document.getElementById('file-input').files;
+  const list = document.getElementById('file-list');
+  list.innerHTML = '';
+  for (let i = 0; i < files.length; i++) {
+    const li = document.createElement('li');
+    li.textContent = files[i].name;
+    list.appendChild(li);
+  }
+}
+// Upload progress tracking
+const form = document.getElementById('upload-form');
+const progressContainer = document.getElementById('progressContainer');
+const progressBar = document.getElementById('progressBar');
+const progressTitle = document.getElementById('progressTitle');
+const progressStats = document.getElementById('progressStats');
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+  const files = document.getElementById('file-input').files;
+  if (!files.length) return alert("Please select files to upload.");
+
+  const formData = new FormData(form);
+  const xhr = new XMLHttpRequest();
+  const startTime = new Date().getTime();
+
+  xhr.open('POST', form.action, true);
+  progressContainer.style.display = 'block';
+  progressBar.style.width = '0%';
+  progressBar.style.background = '#4caf50';
+  progressTitle.textContent = 'Starting upload...';
+  progressStats.textContent = '';
+
+  xhr.upload.onprogress = function (e) {
+    if (e.lengthComputable) {
+      const percent = Math.round((e.loaded / e.total) * 100);
+      const elapsed = (new Date().getTime() - startTime) / 1000;
+      const speed = e.loaded / elapsed; // bytes/sec
+      const remaining = (e.total - e.loaded) / speed;
+      const mbLoaded = (e.loaded / (1024 * 1024)).toFixed(2);
+      const mbTotal = (e.total / (1024 * 1024)).toFixed(2);
+
+      progressBar.style.width = percent + '%';
+      progressTitle.textContent = percent + '% complete';
+      progressStats.textContent = 
+        `Uploaded: ${mbLoaded} MB / ${mbTotal} MB • Speed: ${(speed / 1024 / 1024).toFixed(2)} MB/s • Time left: ${remaining.toFixed(1)}s`;
+    }
+  };
+
+  xhr.onload = function () {
+    if (xhr.status === 200) {
+      progressTitle.textContent = '✅ Upload complete!';
+      progressBar.style.background = '#07a657';
+      setTimeout(() => window.location.reload(), 1000);
+    } else {
+      progressTitle.textContent = '❌ Upload failed.';
+      progressBar.style.background = '#ef4444';
+    }
+  };
+
+  xhr.onerror = function () {
+    progressTitle.textContent = '⚠️ Network error during upload.';
+    progressBar.style.background = '#ef4444';
+  };
+
+  xhr.send(formData);
+});
+</script>
+
+</script>
+<footer style="color: #333; padding: 20px 0; position: fixed; bottom: 0; left: 0; right: 0; background: rgba(255, 255, 255, 0.3);">
+  <div style="display: flex; justify-content: center; align-items: center; gap: 10px; flex-wrap: wrap;">
+    <span>© 2025 <strong>FTP-Box</strong></span>
+    <span style="color: #666;">|</span>
+    <span>Version 1.0</span>
+    <span style="color: #666;">|</span>
+    <span>Powered by <img src="https://www.redhat.com/favicon.ico" alt="RedHat" style="width: 16px;"> RedHat</span>
+    <span style="color: #666;">|</span>
+    <span>Designed by <strong style="background: linear-gradient(45deg, #8a7676, #01b95d); -webkit-background-clip: text; -webkit-text-fill-color: transparent;">AK</strong></span>
+  </div>
+</footer>
+<script>
+function updateStorage() {
+  fetch('/api/storage')
+    .then(res => res.json())
+    .then(data => {
+      document.querySelector('.storage-bar-fill').style.width = data.used_percent + '%';
+      document.querySelector('.storage-bar-fill').style.backgroundColor = data.bar_color;
+      document.querySelector('.storage-stats').innerHTML =
+        `<strong>${data.used_gb.toFixed(1)} GB</strong> used / ${data.total_gb.toFixed(1)} GB total`;
+      document.querySelector('.storage-percent').textContent = data.used_percent + '%';
+    });
+}
+
+setInterval(updateStorage, 1000);
+</script>
+
+<script>
+// File upload preview
+const fileInput = document.getElementById('file-input');
+const fileList = document.getElementById('file-list');
+
+fileInput.addEventListener('change', () => {
+  fileList.innerHTML = '';
+  Array.from(fileInput.files).forEach(file => {
+    const li = document.createElement('li');
+    li.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    fileList.appendChild(li);
+  });
+});
+
+function dropHandler(ev) {
+  ev.preventDefault();
+  const files = ev.dataTransfer.files;
+  fileInput.files = files;
+  fileList.innerHTML = '';
+  Array.from(files).forEach(file => {
+    const li = document.createElement('li');
+    li.textContent = `📄 ${file.name} (${(file.size / 1024).toFixed(1)} KB)`;
+    fileList.appendChild(li);
+  });
+}
+
+function dragOverHandler(ev) { ev.preventDefault(); }
+// File operations
+function createNewFolder(currentPath) {
+  const folderName = prompt('Enter folder name:');
+  if (folderName) {
+    window.location.href = `{{ url_for('create_folder') }}?path=${encodeURIComponent(currentPath)}&name=${encodeURIComponent(folderName)}`;
+  }
+}
+function createNewFile(currentPath) {
+  const fileName = prompt('Enter file name:');
+  if (fileName) {
+    window.location.href = `{{ url_for('create_file') }}?path=${encodeURIComponent(currentPath)}&name=${encodeURIComponent(fileName)}`;
+  }
+}
+function renameItem(oldName, currentPath) {
+  const newName = prompt('Enter new name:', oldName);
+  if (newName && newName !== oldName) {
+    window.location.href = `{{ url_for('rename_item') }}?path=${encodeURIComponent(currentPath)}&old_name=${encodeURIComponent(oldName)}&new_name=${encodeURIComponent(newName)}`;
+  }
+}
+function compressFolder(currentPath, folderName) {
+  if (confirm(`Compress folder "${folderName}" to ZIP?`)) {
+    window.location.href = `{{ url_for('compress_folder') }}?path=${encodeURIComponent(currentPath)}&name=${encodeURIComponent(folderName)}`;
+  }
+}
+</script>
+</body>
+</html>

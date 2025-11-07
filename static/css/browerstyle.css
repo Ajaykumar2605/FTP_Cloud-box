@@ -1,0 +1,478 @@
+/* Reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', sans-serif;
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    color: #2c3e50;
+    padding: 20px;
+    min-height: 100vh;
+}
+
+/* Top bar */
+.top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding: 12px 18px;
+    background: linear-gradient(90deg, #ffffff 0%, #f1f8ff 100%);
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(3, 102, 214, 0.06);
+    border: 1px solid rgba(3, 102, 214, 0.08);
+}
+
+.top-bar h2 {
+    margin: 0;
+    color: #2c3e50;
+}
+
+.logout-btn {
+    background: #dc3545;
+    color: #fff;
+    padding: 6px 14px;
+    border-radius: 6px;
+    font-weight: bold;
+    text-decoration: none;
+}
+
+.logout-btn:hover {
+    background: #b02a37;
+}
+
+/* Table styling */
+table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #fff;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+
+th, td {
+    padding: 12px 15px;
+    text-align: left;
+    font-size: 14px;
+}
+
+th {
+    background-color: #007bff;
+    color: white;
+    font-weight: 600;
+}
+
+tr:hover {
+    background-color: #f8faff;
+} 
+
+
+/* Column widths */
+th:nth-child(1), td:nth-child(1) { width: 40px; text-align: center; }
+th:nth-child(2), td:nth-child(2) { min-width: 200px; }
+th:nth-child(3), td:nth-child(3) { width: 100px; }
+th:nth-child(4), td:nth-child(4) { width: 100px; text-align: right; }
+th:nth-child(5), td:nth-child(5) { width: 160px; color: #666; }
+th:nth-child(6), td:nth-child(6) { width: 100px; font-family: monospace; }
+th:nth-child(7), td:nth-child(7) { width: 140px; }
+th:nth-child(8), td:nth-child(8) { width: 60px; text-align: center; }
+
+/* Checkbox */
+input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    border-radius: 4px;
+    border: 2px solid #007bff;
+    cursor: pointer;
+}
+
+/* Links */
+td a {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+td a:hover {
+    text-decoration: underline;
+}
+
+/* Upload box */
+.upload-box {
+    border: 2px dashed #bbb;
+    border-radius: 10px;
+    padding: 40px;
+    text-align: center;
+    background: #fff;
+    max-width: 600px;
+    margin: 40px auto;
+    transition: all 0.3s ease;
+}
+
+.upload-box:hover {
+    border-color: #007bff;
+    background: #f9fbff;
+}
+
+.upload-icon {
+    font-size: 50px;
+    color: #007bff;
+}
+
+.upload-btn {
+    display: inline-block;
+    background: #007bff;
+    color: white;
+    padding: 10px 20px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: bold;
+    margin-top: 10px;
+}
+
+.upload-btn input[type="file"] {
+    display: none;
+}
+
+.upload-btn:hover {
+    background: #0056b3;
+}
+
+.upload-note {
+    color: #777;
+    font-size: 13px;
+    margin-top: 10px;
+}
+
+.submit-btn {
+    background: #28a745;
+    color: white;
+    padding: 10px 24px;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+    margin-top: 15px;
+    font-weight: bold;
+}
+
+.submit-btn:hover {
+    background: #218838;
+}
+
+/* File preview list */
+.file-list {
+    list-style: none;
+    padding: 0;
+    margin-top: 15px;
+    color: #333;
+    font-size: 14px;
+}
+
+.file-list li {
+    background: #eef3ff;
+    border: 1px solid #d0e2ff;
+    border-radius: 6px;
+    padding: 6px 10px;
+    margin: 5px auto;
+    width: 80%;
+    text-align: left;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    body {
+        padding: 10px;
+    }
+    .top-bar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    table th, table td {
+        padding: 8px 10px;
+        font-size: 13px;
+    }
+    .dropbtn {
+        font-size: 16px;
+    }
+}
+
+@media (max-width: 480px) {
+    table {
+        font-size: 12px;
+    }
+    .upload-box {
+        padding: 20px;
+    }
+    #uploadToggle {
+        padding: 10px 14px;
+        font-size: 14px;
+        margin-top: 14px;
+    }
+}
+
+/* Additional responsive styles */
+@media (max-width: 360px) {
+    .top-bar {
+        padding: 10px;
+    }
+    .logout-btn {
+        padding: 5px 10px;
+    }
+    .upload-btn {
+        padding: 8px 16px;
+    }
+}
+.home-btn {
+  display: inline-block;
+  background: linear-gradient(135deg, #0bca44, #0fa958);
+  color: white;
+  padding: 5px 18px;
+  border-radius: 8px;
+  font-weight: 700;
+  text-decoration: none;
+  font-size: 15px;
+  box-shadow: 0 4px 8px rgba(11, 202, 68, 0.3);
+  transition: all 0.25s ease;
+}
+
+.home-btn:hover {
+  background: linear-gradient(135deg, #0fa958, #0bca44);
+  box-shadow: 0 6px 12px rgba(11, 202, 68, 0.4);
+  transform: translateY(-2px);
+}
+
+
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #333;
+}
+
+.user-icon {
+  width: 28px;       /* perfect size for nav */
+  height: 28px;
+  border-radius: 50%; /* makes it circular */
+  object-fit: cover;
+  border: 2px solid #0bca44;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.logout-btn {
+  background: linear-gradient(135deg, #ff5c5c, #ff3b3b);
+  color: #fff;
+  padding: 6px 12px;
+  border-radius: 6px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.logout-btn:hover {
+  background: linear-gradient(135deg, #ff3b3b, #ff5c5c);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 10px rgba(255, 91, 91, 0.3);
+}
+
+ /* new dropdown styles */
+ /* Dropdown container */
+.dropdown {
+  position: relative;
+  display: inline-block;
+  overflow: visible; /* ensure menu not clipped */
+}
+
+/* Three-dot button */
+.dropbtn {
+  background: transparent;
+  border: none;
+  font-size: 20px;
+  cursor: pointer;
+  color: #007bff;
+  padding: 4px 8px;
+  border-radius: 6px;
+  transition: background 0.2s ease;
+}
+
+.dropbtn:hover {
+  color: #0056b3;
+  background: rgba(0, 123, 255, 0.08);
+}
+
+/* Dropdown menu */
+.dropdown-content {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: 100%;
+  margin-top: 4px;
+  background-color: #fff;
+  min-width: 160px;
+  border-radius: 8px;
+  border: 1px solid #e6eefb;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+  z-index: 9999; /* ensures visibility above all */
+  overflow: visible;
+}
+
+/* Dropdown items */
+.dropdown-content a {
+  display: block;
+  padding: 10px 16px;
+  color: #333;
+  text-decoration: none !important; /* 🚫 removes underline completely */
+  font-size: 0.95rem;
+  transition: all 0.2s ease;
+  border-radius: 6px;
+}
+
+.dropdown-content a:hover {
+  background-color: #f1f8ff;
+  color: #007bff;
+  text-decoration: none !important; /* ensure no underline on hover */
+}
+
+
+/* Show dropdown on hover */
+.dropdown:hover .dropdown-content {
+  display: block;
+  animation: dropdownFade 0.2s ease-in-out;
+}
+
+/* Smooth animation */
+@keyframes dropdownFade {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Prevent table container from cutting dropdown */
+table {
+  overflow: visible !important;
+}
+
+.table-container {
+  overflow: visible !important;
+}
+
+
+/* Folder links (normal + back) */
+.folder-link, .back-link {
+  text-decoration: none;
+  color: #0078d7;
+  font-weight: 600;
+}
+
+.folder-link:hover, .back-link:hover {
+  color: #005fa3;
+  text-decoration: underline;
+}
+
+/* Table first row (.. back folder) subtle highlight */
+tr:first-child td {
+  background-color: #f9f9f9;
+}
+.back-link, .folder-link {
+  text-decoration: none;
+  color: #0078d7;
+  font-weight: 600;
+}
+.back-link:hover, .folder-link:hover {
+  color: #005fa3;
+  text-decoration: underline;
+}
+tr:first-child td {
+  background-color: #f9f9f9;
+}
+/* ✅ Position the storage card on the right */
+#storage-container {
+  position: absolute;
+  top: 65px;
+  right: 40px;
+  z-index: 1000;
+}
+
+/* Card styling */
+.storage-card {
+  width: 400px;
+  background: #fff;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  padding: 15px 12px;
+  font-family: "Segoe UI", Arial, sans-serif;
+  transition: all 0.3s ease;
+}
+
+.storage-card:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Header */
+.storage-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.storage-title {
+  font-size: 1rem;         /* slightly larger */
+  font-weight: 700;        /* bolder font */
+  color: #111;             /* darker for stronger contrast */
+  text-transform: uppercase; /* optional - makes it stand out more */
+  letter-spacing: 0.5px;   /* optional - improves bold readability */
+}
+
+.storage-usage {
+  font-size: 0.9rem; /* slightly larger for readability */
+  font-weight: 600;  /* semi-bold for emphasis */
+  color: #222;       /* darker, professional look */
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  letter-spacing: 0.3px; /* subtle spacing for polish */
+}
+
+/* Bar segments */
+.storage-bar {
+  display: flex;
+  height: 10px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: #ddd;
+  margin-bottom: 6px;
+}
+
+.segment {
+  height: 10px;
+  transition: width 0.4s ease;
+}
+
+.segment.admin { background-color: #4CAF50; }
+.segment.ftpguest { background-color: #FFC107; }
+.segment.ftpuser { background-color: #3dbcf3ff; }
+.segment.free { background-color: #E0E0E0; }
+
+/* Legend */
+.storage-legend {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.85rem;             /* slightly larger for clarity */
+  font-weight: 600;               /* bold, but not too heavy */
+  color: #222;                    /* darker, more professional tone */
+  font-family: "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; /* clean pro font */
+  letter-spacing: 0.3px;          /* adds refined spacing */
+}
+
+.dot {
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  margin-right: 5px;
+}
