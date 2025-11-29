@@ -2,13 +2,21 @@
 from flask import Flask, render_template, request, redirect, url_for, session, send_from_directory, abort, jsonify
 import os, stat, shutil, zipfile, datetime, subprocess
 from werkzeug.utils import secure_filename, safe_join
+import json
 
 STORAGE_ROOT = "/mnt/shared/ftpshare"
-USERS = {
-    "admin": {"password": "admin", "is_admin": True},
-    "ftpguest": {"password": "ftpguest", "is_admin": False},
-    "ftpuser": {"password": "ftpuser", "is_admin": False},
-}
+USERS_FILE = "users.json"
+
+def load_users():
+    if not os.path.exists(USERS_FILE):
+        return {}
+    with open(USERS_FILE, "r") as f:
+        return json.load(f)
+
+USERS = load_users()
+def get_users():
+    with open("users.json", "r") as f:
+        return json.load(f)
 
 app = Flask(__name__)
 app.secret_key = "supersecretkey"
@@ -54,12 +62,16 @@ def login():
     if request.method == "POST":
         username = request.form.get("username")
         password = request.form.get("password")
-        if username in USERS and USERS[username]["password"] == password:
+
+        users = get_users()  # always read latest users.json
+
+        if username in users and users[username]["password"] == password:
             session["username"] = username
             os.makedirs(user_root(), exist_ok=True)
             return redirect(url_for("browse"))
         return render_template("login.html", error="Invalid username or password")
     return render_template("login.html")
+
 
 @app.route("/logout")
 def logout():
@@ -68,8 +80,28 @@ def logout():
 
 @app.before_request
 def require_login():
-    if request.endpoint not in ("login", "static") and "username" not in session:
+    # Allow login + static files
+    if request.endpoint in ("login", "static"):
+        return
+
+    username = session.get("username")
+
+    # Not logged in → redirect
+    if not username:
         return redirect(url_for("login"))
+
+    # Load latest users.json
+    try:
+        with open("users.json", "r") as f:
+            users = json.load(f)
+    except:
+        users = {}
+
+    # AUTO LOG OUT if user was deleted
+    if username not in users:
+        session.pop("username", None)
+        return redirect(url_for("login"))
+
 
 # === Browse Route ===
 @app.route("/browse/", defaults={"path": ""})
@@ -171,18 +203,6 @@ def api_storage():
         }
     })
 
-# === File operations (same as before) ===
-# @app.route("/upload/", methods=["POST"])
-# @app.route("/upload/<path:path>", methods=["POST"])
-# def upload(path=""):
-#     abs_path = secure_path(path)
-#     os.makedirs(abs_path, exist_ok=True)
-#     files = request.files.getlist("file")
-#     for file in files:
-#         if file and file.filename:
-#             filename = secure_filename(file.filename)
-#             file.save(os.path.join(abs_path, filename))
-#     return redirect(url_for("browse", path=path))
 @app.route("/upload/", methods=["POST"])
 @app.route("/upload/<path:path>", methods=["POST"])
 def upload(path=""):

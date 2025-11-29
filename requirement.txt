@@ -1,0 +1,16 @@
+# Flask web framework
+Flask==3.0.3
+
+# Secure file handling (built-in with Flask but included for clarity)
+Werkzeug==3.0.2
+
+# WSGI production server (recommended instead of flask dev server)
+gunicorn==22.0.0
+
+# System utilities for file and permission operations
+psutil==6.0.0
+
+# Optional: for secure SSL/TLS or advanced requests handling (if needed later)
+requests==2.32.3
+
+# command: pip3 install -r requirements.txt

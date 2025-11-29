@@ -1,0 +1,14 @@
+{
+  "admin": {
+    "password": "admin",
+    "is_admin": true
+  },
+  "ftpguest": {
+    "password": "ftpguest",
+    "is_admin": false
+  },
+  "ftpuser": {
+    "password": "ftpuser",
+    "is_admin": false
+  }
+}

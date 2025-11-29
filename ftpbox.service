@@ -1,0 +1,16 @@
+[Unit]
+Description=FTP Box Flask Service
+After=network.target
+
+[Service]
+User=root
+Group=root
+WorkingDirectory=/mnt/shared/ftpshare/
+ExecStart=/usr/bin/python3 /opt/FTP_Cloud/app.py
+Restart=always
+Environment="PATH=/usr/bin"
+Environment="FLASK_ENV=production"
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target
