@@ -1,4 +1,5 @@
 #!/bin/bash
+export TERM=xterm
 
 USER_DB="users.json"
 STORAGE_ROOT="/mnt/shared/ftpshare"
